@@ -60,24 +60,31 @@ section {
 }
 
 .hero-text h1 {
+  font-size: 14px;
+  color: #41E1D4;
+  text-transform: uppercase;
+  letter-spacing: -0.5%;
+  line-height: 32px;
+}
+.hero-text h2 {
   font-size: clamp(4rem, 3.1429rem + 3.2653vw, 6rem);
   line-height: 1.1;
   margin-bottom: 1rem;
   font-weight: bold;
 }
 
-.hero-text h1 span {
+.hero-text h2 span {
   color: #00c3ff;
 }
 
-.hero-text h1 span.light {
+.hero-text h2 span.light {
   font-weight: 100;
   font-style: italic;
 }
 
 .subtitle {
   font-size: 0.9rem;
-  color: #a0a0a0;
+  line-height: 110%;
   max-width: 600px;
   margin: 0 auto 2rem auto;
 }
@@ -179,9 +186,6 @@ section {
 
 /* Responsive simple */
 @media (max-width: 768px) {
-  h1 {
-    font-size: 2.5rem;
-  }
 
   .bento-grid {
     display: flex;
