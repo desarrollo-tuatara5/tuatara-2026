@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = "https://webtuatara.com/insomniodev-docs/keyframe";
     const extension = "png";
     const currentFrame = (index) =>
-        `${url}/frames-${index.toString().padStart(2, "0")}.${extension}`;
+        `${url}/keyframes-${index.toString().padStart(2, "0")}.${extension}`;
 
     const images = [];
     const sequence = {
@@ -29,20 +29,23 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // 2. Función para dibujar la imagen correcta en el canvas
-    const render = () => {
-        // Calcular el índice actual
-        let frameIndex = Math.round(sequence.frame);
-        // obtenemos la imagen del array
-        let img = images[frameIndex];
+    let lastRenderedFrame = -1;
 
-        // Limpiar canvas, para que no se acumulen imágenes
-        context.clearRect(0, 0, canvas.width, canvas.height);
+    const render = () => {
+        // 1. Calcular índice
+        let frameIndex = Math.round(sequence.frame);
         
-        if (img && img.complete) {
+        // Evitar redibujar el mismo frame innecesariamente
+        if (frameIndex === lastRenderedFrame) return;
+        let img = images[frameIndex];
+        if (img && img.complete && img.naturalHeight !== 0) {
+            
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
-        } else {
-            // Opcional: console.log(`Frame ${frameIndex} no listo aún`);
-        }
+            
+            lastRenderedFrame = frameIndex;
+        } 
     };
 
     // 3. Configuración del tamaño del canvas (Responsive)
@@ -61,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 4. Animación con GSAP ScrollTrigger
     //    Animamos la propiedad 'frame' del objeto 'sequence' de 0 a (frameCount - 1)
     gsap.to(sequence, {
-        frame: frameCount - 1,
+        frame: frameCount ,
         snap: "frame",
         ease: "none",
         scrollTrigger: {
@@ -72,4 +75,50 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         onUpdate: render,
     });
+
+
+const tlImpact = gsap.timeline({
+    scrollTrigger: {
+        trigger: ".impact-wrapper",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1, // Suavizado
+        pin: ".impact-sticky",
+        anticipatePin: 1
+    }
 });
+
+// FASE 1: ABRIR (Muestra Texto Principal)
+tlImpact
+    .addLabel("start")
+    // Abrir los puños
+    .to(".fist-left", { xPercent: -90, duration: 2, ease: "power2.inOut" }, "open1")
+    .to(".fist-right", { xPercent: 90, duration: 2, ease: "power2.inOut" }, "open1")
+    // Mostrar sección 1, animado
+    .to(".impact-text", { opacity: 1, scale: 1, duration: 2 }, "open1")
+
+    // Mantener el sección 1 por 1.5 
+    .to({}, { duration: 1.5 })
+
+    // Cerrar sección 1,animado
+    .addLabel("closing")
+    .to(".fist-left", { xPercent: 0, duration: 2, ease: "power2.inOut" }, "close1")
+    .to(".fist-right", { xPercent: 0, duration: 2, ease: "power2.inOut" }, "close1")
+    .to(".impact-text", { opacity: 0, scale: 0.9, duration: 1 }, "close1")
+
+    // CAMBIO DE ESCENA
+    // Mostrar sección 2
+    .set(".social-content", { opacity: 0, scale: 0.9, duration: 2 })
+
+    // FASE 3: Abrir punños
+    .addLabel("opening2")
+    .to(".fist-left", { xPercent: -90, duration: 2, ease: "power2.inOut" }, "open2")
+    .to(".fist-right", { xPercent: 90, duration: 2, ease: "power2.inOut" }, "open2")
+    // Pequeño zoom in al contenido social
+    .to(".social-content", { opacity: 1, scale: 1, duration: 2 }, "open2");
+
+// AL TERMINAR: El usuario sigue haciendo scroll y la sección se desplaza hacia arriba naturalmente.
+});
+
+
+    
